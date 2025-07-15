@@ -1,6 +1,6 @@
 [Project]
 FileName=QED.dev
-Name=QQMusic_Ekey_Decrypt
+Name=QQMusic_Ekey_Decryptor
 Type=1
 Ver=2
 ObjFiles=
@@ -19,7 +19,7 @@ ObjectOutput=
 LogOutput=
 LogOutputEnabled=0
 OverrideOutput=0
-OverrideOutputName=ÏîÄ¿1.exe
+OverrideOutputName=
 HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
