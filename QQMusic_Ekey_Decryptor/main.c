@@ -5,13 +5,21 @@
 unsigned char keyMap[1024];
 unsigned int keyLen = 1024;
 
-void set_ext(char *filename, const char *new_ext) {
+void set_ext(char *filename) {
+	char *new_ext;
 	char *dot = strrchr(filename, '.');
-	if (dot) strcpy(dot , new_ext);
-	else strcat(filename, new_ext);
+	if (dot)
+		if(strcmp(dot, ".mflac") == 0)
+			strcpy(dot , ".flac");
+		else if(strcmp(dot, ".mgg") == 0)
+			strcpy(dot , ".ogg");
+		else strcpy(dot, ".flac");
+	else strcat(filename, ".flac");
 }
 
 int main(int argc, char *argv[]) {
+	printf("\n");
+
 	if(argc < 3) {
 		printf("Usage: %s <ekey_base64> <file_in> [<file_out>]\n", argv[0]);
 		return -1;
@@ -27,18 +35,18 @@ int main(int argc, char *argv[]) {
 	char outName[128];
 	if(argc == 3) {
 		strcpy(outName, argv[2]);
-		set_ext(outName, ".flac");
+		set_ext(outName);
 	} else
 		strcpy(outName, argv[3]);
 
 	FILE *fin = fopen(argv[2], "rb");
 	if (!fin) {
-		printf("Error opening input file: %s", argv[2]);
+		printf("Error opening input file: %s\n", argv[2]);
 		return -1;
 	}
 	FILE *fout = fopen(outName, "wb");
 	if (!fout) {
-		printf("Error opening output file: %s", outName);
+		printf("Error opening output file: %s\n", outName);
 		fclose(fin);
 		return -1;
 	}
@@ -62,7 +70,7 @@ int main(int argc, char *argv[]) {
 
 	fclose(fin);
 	fclose(fout);
-	printf("\nProcessed: %s\n", outName);
+	printf("Processed: %s\n", outName);
 	return 0;
 }
 
