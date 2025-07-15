@@ -45,7 +45,7 @@ void InitRC4KSA() {
 void EncFirstSegment(unsigned __int64 place, char *xorMap) {
 	int i;
 	for ( i = place; i < 128; i++ )
-		xorMap[i] = keyMap[(unsigned __int64)((double)key1 / (double)((i + 1) * keyMap[i % keyLen]) * 100.0) % keyLen];
+		xorMap[i] = keyMap[(unsigned __int64)(100.0 * key1 / ((i + 1) * keyMap[i % keyLen])) % keyLen];
 }
 
 void EncASegment(unsigned __int64 place, char *xorMap, unsigned int decSize) {
