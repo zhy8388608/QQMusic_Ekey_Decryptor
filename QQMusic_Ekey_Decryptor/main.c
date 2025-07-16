@@ -1,20 +1,19 @@
 #include "common.h"
 
+#ifdef _WIN32
+	#include <windows.h>
+#endif
+
 #define BUFFER_SIZE 8192
 
 unsigned char keyMap[1024];
 unsigned int keyLen = 1024;
 
-void set_ext(char *filename) {
-	char *new_ext;
+char *set_ext(char *filename, char *new_ext) {
 	char *dot = strrchr(filename, '.');
-	if (dot)
-		if(strcmp(dot, ".mflac") == 0)
-			strcpy(dot , ".flac");
-		else if(strcmp(dot, ".mgg") == 0)
-			strcpy(dot , ".ogg");
-		else strcpy(dot, ".flac");
-	else strcat(filename, ".flac");
+	if(dot)strcpy(dot, new_ext);
+	else strcat(filename, new_ext);
+	return filename;
 }
 
 int main(int argc, char *argv[]) {
@@ -32,44 +31,61 @@ int main(int argc, char *argv[]) {
 	if(keyLen > 300)
 		InitRC4KSA();
 
-	char outName[128];
-	if(argc == 3) {
-		strcpy(outName, argv[2]);
-		set_ext(outName);
-	} else
-		strcpy(outName, argv[3]);
+	char tmpName[256];
+	char outName[256];
+
+	if(argc == 3)
+		strcpy(tmpName, argv[2]);
+	else
+		strcpy(tmpName, argv[3]);
+	set_ext(tmpName, ".tmp");
 
 	FILE *fin = fopen(argv[2], "rb");
-	if (!fin) {
+	if(!fin) {
 		printf("Error opening input file: %s\n", argv[2]);
 		return -1;
 	}
-	FILE *fout = fopen(outName, "wb");
-	if (!fout) {
-		printf("Error opening output file: %s\n", outName);
+	FILE *fout = fopen(tmpName, "wb");
+	if(!fout) {
+		printf("Error opening output file: %s\n", tmpName);
 		fclose(fin);
 		return -1;
 	}
 
 	unsigned char buffer[BUFFER_SIZE];
-	unsigned char xorMap[BUFFER_SIZE];
 	unsigned __int64 totalBytes = 0;
 	int n, i;
-	while ((n = fread(buffer, 1, sizeof(buffer), fin)) > 0) {
+	while((n = fread(buffer, 1, sizeof(buffer), fin)) > 0) {
 		if(keyLen <= 300)
-			ProcessByMapL(totalBytes, xorMap, n);
+			ProcessByMapL(totalBytes, buffer, n);
 		else
-			ProcessByRC4(totalBytes, xorMap, n);
-
-		for(i = 0; i < n; i++)
-			buffer[i] ^= xorMap[i];
+			ProcessByRC4(totalBytes, buffer, n);
 		fwrite(buffer, n, 1, fout);
-
 		totalBytes += n;
 	}
 
 	fclose(fin);
 	fclose(fout);
+
+	if(argc == 3) {
+		strcpy(outName, argv[2]);
+		set_ext(outName, ".bin");
+		FILE *fin1 = fopen(tmpName, "rb");
+		if(fread(buffer, 1, 5, fin1) == 5)
+			if(strcmp(buffer, "fLaC") == 0)
+				set_ext(outName, ".flac");
+			else if(strcmp(buffer, "OggS") == 0)
+				set_ext(outName, ".ogg");
+		fclose(fin1);
+	} else 
+		strcpy(outName, argv[3]);
+
+	#ifdef _WIN32
+		MoveFileEx(tmpName, outName, MOVEFILE_REPLACE_EXISTING);
+	#else
+		rename(tmpName, outName);
+	#endif
+
 	printf("Processed: %s\n", outName);
 	return 0;
 }

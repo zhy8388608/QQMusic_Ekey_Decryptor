@@ -7,7 +7,7 @@ static inline uint32_t bswap32(uint32_t value) {
 	       ((value & 0xFF000000U) >> 24);
 }
 
-unsigned int * TeaDecryptECB(unsigned int *ciphertext, const unsigned __int8 *key, unsigned __int8 *out) {
+unsigned int *TeaDecryptECB(unsigned int *ciphertext, const unsigned __int8 *key, unsigned __int8 *out) {
 	unsigned int v3;
 	unsigned int v4;
 	int v5;
@@ -17,10 +17,10 @@ unsigned int * TeaDecryptECB(unsigned int *ciphertext, const unsigned __int8 *ke
 
 	v3 = bswap32(*ciphertext);
 	v4 = bswap32(ciphertext[1]);
-	for ( i = 0; i <= 3; ++i )
+	for(i = 0; i <= 3; ++i)
 		v8[i] = bswap32(*(int *)&key[4 * i]);
 	v5 = -478700656;
-	for ( j = 0; j <= 15; ++j ) {
+	for(j = 0; j <= 15; ++j) {
 		v4 -= (16 * v3 + v8[2]) ^ (v3 + v5) ^ ((v3 >> 5) + v8[3]);
 		v3 -= (16 * v4 + v8[0]) ^ (v4 + v5) ^ ((v4 >> 5) + v8[1]);
 		v5 += 1640531527;
@@ -66,15 +66,15 @@ int oi_symmetry_decrypt2(
 		v16 = 0; \
 	}
 
-	if ( (ciphertextLen & 7) != 0 || ciphertextLen <= 15 )
+	if((ciphertextLen & 7) != 0 || ciphertextLen <= 15)
 		return 0;
 	TeaDecryptECB((unsigned int *)ciphertext, key, v26);
 	v25 = v26[0] & 7;
 	v17 = ciphertextLen - 1 - v25 - 9;
-	if ( *outlen < v17 || v17 < 0 )
+	if(*outlen < v17 || v17 < 0)
 		return 0;
 	*outlen = v17;
-	for ( i = 0; i <= 7; ++i )
+	for(i = 0; i <= 7; ++i)
 		v27[i] = 0;
 	v14 = v27;
 	v15 = ciphertext;
@@ -82,8 +82,8 @@ int oi_symmetry_decrypt2(
 	v24 = 8;
 	v16 = v25 + 1;
 	v19 = 1;
-	while ( v19 <= 2 ) {
-		if ( v16 > 7 ) {
+	while(v19 <= 2) {
+		if(v16 > 7) {
 			PROCESS_BLOCK();
 		} else {
 			++v16;
@@ -91,8 +91,8 @@ int oi_symmetry_decrypt2(
 		}
 	}
 	v13 = *outlen;
-	while ( v13 ) {
-		if ( v16 > 7 ) {
+	while(v13) {
+		if(v16 > 7) {
 			PROCESS_BLOCK();
 		} else {
 			v6 = out++;
@@ -102,11 +102,11 @@ int oi_symmetry_decrypt2(
 		}
 	}
 	v20 = 1;
-	while ( v20 <= 7 ) {
-		if ( v16 > 7 ) {
+	while(v20 <= 7) {
+		if(v16 > 7) {
 			PROCESS_BLOCK();
 		} else {
-			if ( v26[v16] != v14[v16] )
+			if(v26[v16] != v14[v16])
 				return 0;
 			++v16;
 			++v20;
@@ -134,10 +134,10 @@ static const unsigned char base64_suffix_map[128] = {
 int base64_decode(const char *indata, int inlen, char *outdata, int *outlen) {
 
 	int ret = 0;
-	if (indata == NULL || inlen <= 0 || outdata == NULL || outlen == NULL) {
+	if(indata == NULL || inlen <= 0 || outdata == NULL || outlen == NULL) {
 		return ret = -1;
 	}
-	if (inlen % 4 != 0) {
+	if(inlen % 4 != 0) {
 		return ret = -2;
 	}
 
@@ -145,23 +145,23 @@ int base64_decode(const char *indata, int inlen, char *outdata, int *outlen) {
 	unsigned char c = 0;
 	int g = 3;
 
-	while (x < inlen) {
+	while(x < inlen) {
 		c = base64_suffix_map[indata[x++]];
-		if (c == 255) return -1;
-		if (c == 253) continue;
-		if (c == 254) {
+		if(c == 255) return -1;
+		if(c == 253) continue;
+		if(c == 254) {
 			c = 0;
 			g--;
 		}
 		t = (t << 6) | c;
-		if (++y == 4) {
+		if(++y == 4) {
 			outdata[i++] = (unsigned char)((t >> 16) & 0xff);
-			if (g > 1) outdata[i++] = (unsigned char)((t >> 8) & 0xff);
-			if (g > 2) outdata[i++] = (unsigned char)(t & 0xff);
+			if(g > 1) outdata[i++] = (unsigned char)((t >> 8) & 0xff);
+			if(g > 2) outdata[i++] = (unsigned char)(t & 0xff);
 			y = t = 0;
 		}
 	}
-	if (outlen != NULL) {
+	if(outlen != NULL) {
 		*outlen = i;
 	}
 	return ret;
@@ -181,8 +181,8 @@ int SimpleMakeKey(char *out) {
 void makeKey(const char *head, char *key) {
 	char keyHelper[] = {0x69, 0x56, 0x46, 0x38, 0x2b, 0x20, 0x15, 0x0b}; // SimpleMakeKey
 	int i;
-	for ( i = 0; i <= 0xF; ++i ) {
-		if ( (i & 1) != 0 )
+	for(i = 0; i <= 0xF; ++i) {
+		if((i & 1) != 0)
 			key[i] = head[i >> 1];
 		else
 			key[i] = keyHelper[i >> 1];

@@ -7,6 +7,6 @@ extern unsigned int keyLen;
 
 int decryptEkey(const char *indata, int inlen, char *outdata, int *outlen);
 void InitRC4KSA();
-void ProcessByMapL(unsigned __int64 place, char *xorMap, unsigned __int64 decSize);
-void ProcessByRC4(unsigned __int64 place, char *xorMap, unsigned __int64 decSize);
+void ProcessByMapL(unsigned __int64 place, char *dataStream, unsigned __int64 decSize);
+void ProcessByRC4(unsigned __int64 place, char *dataStream, unsigned __int64 decSize);
 
